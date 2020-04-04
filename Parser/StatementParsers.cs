@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -376,9 +375,10 @@ namespace IL
                     stt = token.GetData<IBaseStatement>();
                     returns |= stt.CheckReturn();
                     stt.Emit(generator);
-                    if (lexer.Source.IsEnd())
+                    CommitPeek();
+                    if (lexer.Source.CommitAndCheckIsEnd())
                     { break; }
-                    PeekToken(ProgramState.AfterDef);
+                    RePeekToken(ProgramState.AfterDef);
                 }
                 if (!returns)
                 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace IL
 {
@@ -80,9 +79,7 @@ namespace IL
         protected void ExpectNoShift(ListTokenTester tester)
         {
             if (!TestNoShift(tester))
-            {
-                throw lexer.GetLastTokenError(tester);
-            }
+            { throw lexer.GetLastTokenError(tester); }
         }
         protected void ExpectNoShift(Token.Type expected) =>
             ExpectNoShift(new ListTokenTester(expected));
@@ -112,6 +109,13 @@ namespace IL
         {
             if (!vars.ContainsKey(name))
             {
+                if (ProgramParser.IsKeyword(name))
+                {
+                    throw Error(
+                        (at, message) => new UnexpectedTokenException(at, message),
+                        "keyword '" + name + "', expected variable name"
+                        );
+                }
                 throw Error(
                     (at, message) => new UnrecognizedTokenException(at, message),
                     "cannot find variable '" + name
@@ -124,6 +128,13 @@ namespace IL
         {
             if (!funcs.ContainsKey(name))
             {
+                if (ProgramParser.IsKeyword(name))
+                {
+                    throw Error(
+                        (at, message) => new UnexpectedTokenException(at, message),
+                        "keyword '" + name + "', expected function name"
+                        );
+                }
                 throw Error(
                     (at, message) => new UnrecognizedTokenException(at, message),
                     "cannot find function '" + name + "' to call"

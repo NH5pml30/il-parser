@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace IL
 {
@@ -38,26 +33,28 @@ namespace IL
                 var zero, return0, afas;
                 zero = 03948319;
                 {}{}{}
-                x = 5 * FooMethod(FooMethod(FooMethod(0, 1), 2), 3);
+                zero = 5 * FooMethod(FooMethod(FooMethod(0, 1), 2), 3);
                 PrintLine(x);
                 return0 = 324;
                 PrintLine(zero);
-                if (false) return 0;
-                if(FooMethod(FooMethod(FooMethod(0, 1), 2), 3) > 0){
-                    return 100;
-                }else;
-                PrintLineb(!!!!!!!(return0 == 0));
-                {}
-                return 1;
+                if (true || x < 0) {
+                    if (false) return 0;
+                    if (FooMethod(FooMethod(FooMethod(0, 1), 2), 3) > 0) {
+                        if (x >= 2) {
+                            PrintLine(5066355);
+                        }
+                        else {
+                            PrintLine(4411083);
+                        }
+                        {
+                            return+++---(-------100);
+                        }
+                    } else {;}
+                    PrintLineb(!!!!!!!(return0 == 0));
+                    {}
+                    return 1;
+                }
             ");
-            /*
-            var result = Compile(@"
-                if (x >= 2 && SetZero())
-                ;
-                PrintLine(zero);
-                return 1;
-            ");
-            */
             Console.WriteLine(result.Invoke(1, 1, 1));
             Console.WriteLine(result.Invoke(2, 2, 2));
             Console.WriteLine(result.Invoke(2, 3, 4));

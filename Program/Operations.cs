@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
-using System.Text;
 using System.ComponentModel;
 using System.Reflection;
-using System.Linq.Expressions;
 
 namespace IL
 {
@@ -81,19 +79,11 @@ namespace IL
         virtual public void Emit(ILGenerator generator)
         {
             if (args != null)
-            {
-                foreach (IBaseExpression arg in args)
-                {
-                    arg.Emit(generator);
-                }
-            }
+            { Array.ForEach(args, arg => arg.Emit(generator)); }
             emitter(generator);
         }
 
-        public Type GetResultType()
-        {
-            return descriptor.RetType;
-        }
+        public Type GetResultType() => descriptor.RetType;
 
         virtual public object Evaluate()
         {
@@ -170,9 +160,12 @@ namespace IL
             return new OperationTypeDescriptor(typeof(Out), new[] { typeof(Arg) });
         }
 
+        public delegate UnaryOperation Factory(IBaseExpression arg);
+
         public static Token.Factory GetFactory(Type type)
         {
-            return str => new Token(Token.Type.UnaryOperator, str, type);
+            return str => new Token(Token.Type.UnaryOperator, str,
+                new KeyValuePair<Factory, Type>(arg => new UnaryOperation(type, arg), type));
         }
 
         public UnaryOperation(Type type, IBaseExpression arg) :
@@ -487,8 +480,7 @@ namespace IL
 
     public class Variable : BaseOperation, IBaseExpression
     {
-        private delegate void EmitWrite(ILGenerator generator);
-        private readonly EmitWrite emitStore;
+        private readonly IEmittable.Emitter emitStore;
 
         public void EmitStore(ILGenerator generator)
         {
@@ -514,12 +506,11 @@ namespace IL
                 new OperationTypeDescriptor(typeof(long))
                 )
         {
-            emitStore = gen => gen.Emit(isLocal ? OpCodes.Stloc : OpCodes.Starg, varIndex);
+            emitStore = isLocal ?
+                (IEmittable.Emitter)(gen => gen.Emit(OpCodes.Stloc, varIndex)) :
+                gen => gen.Emit(OpCodes.Starg, varIndex);
         }
 
-        public override string ToString()
-        {
-            return name;
-        }
+        public override string ToString() => name;
     }
 }

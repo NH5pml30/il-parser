@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Reflection.Emit;
-using System.Text.RegularExpressions;
 
 namespace IL
 {
@@ -10,15 +8,11 @@ namespace IL
     {
         public readonly List<string> names;
 
-        public VarDefStatement(List<string> names)
-        {
+        public VarDefStatement(List<string> names) =>
             this.names = names;
-        }
 
-        public void Emit(ILGenerator generator)
-        {
+        public void Emit(ILGenerator generator) =>
             names.ForEach(name => generator.DeclareLocal(typeof(long)));
-        }
 
         public bool CheckReturn() => false;
     }
@@ -72,7 +66,7 @@ namespace IL
     {
         private readonly IBaseExpression expr;
 
-        public ExpressionStatement(IBaseExpression expr) { this.expr = expr; }
+        public ExpressionStatement(IBaseExpression expr) => this.expr = expr;
 
         public void Emit(ILGenerator generator)
         {
@@ -91,15 +85,11 @@ namespace IL
     {
         private readonly List<IBaseStatement> blockables;
 
-        public ExprOrBlockStatement(List<IBaseStatement> blockables)
-        {
+        public ExprOrBlockStatement(List<IBaseStatement> blockables) =>
             this.blockables = blockables;
-        }
 
-        public void Emit(ILGenerator generator)
-        {
+        public void Emit(ILGenerator generator) =>
             blockables.ForEach(x => x.Emit(generator));
-        }
 
         public bool CheckReturn()
         {
@@ -147,6 +137,7 @@ namespace IL
             }
             else
             {
+                // general case
                 var endif = generator.DefineLabel();
                 condition.Emit(generator);
                 generator.Emit(OpCodes.Brfalse, endif);
@@ -173,7 +164,10 @@ namespace IL
                 { return ifBranch.CheckReturn(); }
                 else if (elseBranch != null)
                 { return elseBranch.CheckReturn(); }
+                else
+                { return false; }
             }
+            // general case
             return ifBranch.CheckReturn() && elseBranch != null && elseBranch.CheckReturn();
         }
     }

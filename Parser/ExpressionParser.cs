@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Text;
 
 namespace IL
 {
@@ -13,9 +10,7 @@ namespace IL
             Dictionary<string, Variable> vars,
             Dictionary<string, MethodOperation.Factory> funcs
             )
-        {
-            return new Parser(expr, vars, funcs).Parse();
-        }
+        { return new Parser(expr, vars, funcs).Parse(); }
 
         public static List<string> Keywords { get; } = new List<string>() { "true", "false" };
 
@@ -40,13 +35,9 @@ namespace IL
                     RetrieveString();
                 }
                 catch (TypeMismatchException e)
-                {
-                    throw new TypeMismatchParserException(SourceAt, e);
-                }
+                { throw new TypeMismatchParserException(SourceAt, e); }
                 catch (ArgumentsNumberMismatchException e)
-                {
-                    throw new ArgumentsNumberMismatchParserException(SourceAt, e);
-                }
+                { throw new ArgumentsNumberMismatchParserException(SourceAt, e); }
                 return res;
             }
 
@@ -90,11 +81,11 @@ namespace IL
                 }
                 else if (Test(Token.Type.UnaryOperator, State.Pre))
                 {
-                    var oper = lastToken.GetData<UnaryOperation.Type>();
-                    left = new UnaryOperation(
-                        oper,
-                        ParseSubexpression(oper.GetPriority())
-                        );
+                    var (factory, oper) =
+                        lastToken.GetData<
+                            KeyValuePair<UnaryOperation.Factory, UnaryOperation.Type>
+                            >();
+                    left = factory(ParseSubexpression(oper.GetPriority()));
                 }
                 else
                 {
@@ -110,12 +101,10 @@ namespace IL
                     if (!TestNoShift(Token.Type.BinaryOperator))
                     { break; }
 
-                    (BinaryOperation.Factory factory, BinaryOperation.Type oper) =
+                    var (factory, oper) =
                         token.GetData<KeyValuePair<BinaryOperation.Factory, BinaryOperation.Type>>();
                     if (oper.GetPriority() >= lastPriority)
-                    {
-                        break;
-                    }
+                    { break; }
                     PeekToken(State.Pre);
                     left = factory(left, ParseSubexpression(oper.GetPriority()));
                 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Linq;
 
@@ -68,29 +67,8 @@ namespace IL
             CachedCharInLine = other.CachedCharInLine;
         }
 
-        // Picks first best
-        public (Match longestMatch, Regex regex) PickLongestMatch(List<Regex> regexs)
-        {
-            Match bestMatch = Match.Empty;
-            Regex bestRegex = null;
-            foreach (Regex regex in regexs)
-            {
-                Match curMatch = regex.Match(data, cachedPos);
-                if (curMatch.Success &&
-                    (bestMatch == Match.Empty || curMatch.Length > bestMatch.Length))
-                {
-                    bestMatch = curMatch;
-                    bestRegex = regex;
-                }
-            }
-            FillCachedPoses(bestMatch.Value);
-            return (bestMatch, bestRegex);
-        }
-
         public Match MatchOne(Regex regex)
-        {
-            return regex.Match(data, cachedPos);
-        }
+        { return regex.Match(data, cachedPos); }
 
         public void CommitCachedPos()
         {
@@ -116,7 +94,7 @@ namespace IL
             FillCachedPoses(data.Substring(cachedPos, x));
         }
 
-        public bool IsEnd()
+        public bool CommitAndCheckIsEnd()
         {
             SkipWhitespaces();
             CommitCachedPos();

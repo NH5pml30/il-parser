@@ -107,9 +107,7 @@ namespace IL
             Array.ForEach(statesForTypes, ((Token.Type type, StateT before) tuple) =>
             {
                 if (!edgeBegins.ContainsKey(tuple.type))
-                {
-                    edgeBegins.Add(tuple.type, new List<StateT>());
-                }
+                { edgeBegins.Add(tuple.type, new List<StateT>()); }
                 edgeBegins[tuple.type].Add(tuple.before);
             });
             foreach (var matchable in matchables)
@@ -117,9 +115,7 @@ namespace IL
                 foreach (var before in edgeBegins[matchable.TokenType])
                 {
                     if (!matchablesByState.ContainsKey(before))
-                    {
-                        matchablesByState.Add(before, new List<IMatchable>());
-                    }
+                    { matchablesByState.Add(before, new List<IMatchable>()); }
                     matchablesByState[before].Add(matchable);
                 }
             }
@@ -140,9 +136,7 @@ namespace IL
         private void CacheToken()
         {
             if (state.Equals(endState) || cachedToken != null)
-            {
-                return;
-            }
+            { return; }
 
             Source.SkipWhitespaces();
             IMatchable match = null;

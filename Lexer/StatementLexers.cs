@@ -61,7 +61,11 @@ namespace IL
             Dictionary<string, MethodOperation.Factory> funcs,
             MatchableElementFactory[] factories
             ) :
-            base(statesForTypes, AddExpressionMatch(matchables, vars, funcs, factories), begin, end, source)
+            base(
+                statesForTypes,
+                AddExpressionMatch(matchables, vars, funcs, factories),
+                begin, end, source
+                )
         { }
 
         protected BaseStatementLexer(
@@ -94,7 +98,7 @@ namespace IL
         private static readonly IMatchable[] matchables =
             new IMatchable[]
             {
-                new MatchableRegex(new Regex(@"\Gvar\s+"), Token.Type.Var,
+                new MatchableRegex(new Regex(@"\Gvar\b"), Token.Type.Var,
                     str => new Token(Token.Type.Var, str)),
                 matchableComma,
                 matchableName,
@@ -171,7 +175,7 @@ namespace IL
         private static readonly IMatchable[] matchables =
             new IMatchable[]
             {
-                new MatchableRegex(new Regex(@"\Greturn\s+"), Token.Type.Return,
+                new MatchableRegex(new Regex(@"\Greturn\b"), Token.Type.Return,
                     str => new Token(Token.Type.Return, str)),
                 matchableSemicolon,
             };
@@ -260,9 +264,9 @@ namespace IL
             {
                 matchableLeftPar,
                 matchableRightPar,
-                new MatchableRegex(new Regex(@"\Gif"),
+                new MatchableRegex(new Regex(@"\Gif\b"),
                     Token.Type.If, str => new Token(Token.Type.If, str)),
-                new MatchableRegex(new Regex(@"\Gelse"),
+                new MatchableRegex(new Regex(@"\Gelse\b"),
                     Token.Type.Else, str => new Token(Token.Type.Else, str)),
             };
 
