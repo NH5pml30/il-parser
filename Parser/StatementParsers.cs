@@ -7,15 +7,18 @@ namespace IL
 {
     public static class VarDefParser
     {
-        public static VarDefStatement Parse(MarkedString source) =>
-            new Parser(source).Parse();
+        public static VarDefStatement Parse(
+            MarkedString source,
+            Dictionary<string, Variable> vars
+            ) =>
+            new Parser(source, vars).Parse();
 
         public static List<string> Keywords { get; } = new List<string>() { "var" };
 
         private class Parser : BaseParser<VarDefState, VarDefLexer>
         {
-            public Parser(MarkedString source) :
-                base(new VarDefLexer(source))
+            public Parser(MarkedString source, Dictionary<string, Variable> vars) :
+                base(new VarDefLexer(source), vars)
             {
             }
 
@@ -31,12 +34,31 @@ namespace IL
                         if (ProgramParser.IsKeyword(lastToken.str))
                         {
                             throw Error(
-                                (at, message) => new UnsupportedIdentifierException(at, message),
+                                (at, message) =>
+                                    new UnsupportedIdentifierException(at, message, "matches keyword"),
+                                lastToken.str
+                                );
+                        }
+                        if (vars.ContainsKey(lastToken.str))
+                        {
+                            throw Error(
+                                (at, message) =>
+                                    new UnsupportedIdentifierException(at, message,
+                                        "matches argument name"),
                                 lastToken.str
                                 );
                         }
                         if (!res.Contains(lastToken.str))
                         { res.Add(lastToken.str); }
+                        else
+                        {
+                            throw Error(
+                                (at, message) =>
+                                    new UnsupportedIdentifierException(at, message,
+                                        "redefinition"),
+                                lastToken.str
+                                );
+                        }
                         if (Test(Token.Type.Semicolon, VarDefState.End))
                         { break; }
                         Expect(Token.Type.Comma, VarDefState.Pre);
@@ -286,6 +308,8 @@ namespace IL
         {
             private static readonly Dictionary<string, Variable> argVars =
                 new Dictionary<string, Variable>();
+            private readonly Dictionary<string, Variable> globalVars =
+                new Dictionary<string, Variable>();
 
             static Parser()
             {
@@ -336,7 +360,7 @@ namespace IL
                         BindingFlags.Static |
                         BindingFlags.Public
                         ),
-                    field => vars[field.Name] = new Variable(field)
+                    field => globalVars[field.Name] = new Variable(field)
                     );
 
                 Array.ForEach(
@@ -366,6 +390,11 @@ namespace IL
                     int i = 0;
                     defStt.names.ForEach(name => vars[name] = new Variable(name, i++, true));
                     PeekToken(ProgramState.AfterDef);
+                }
+                foreach (var (name, obj) in globalVars)
+                {
+                    if (!vars.ContainsKey(name))
+                    { vars[name] = obj; }
                 }
 
                 IBaseStatement stt = null;

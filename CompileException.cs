@@ -110,8 +110,8 @@ namespace IL
     public class UnsupportedIdentifierException : ParserException
     {
         public string Identifier { get; }
-        public UnsupportedIdentifierException(string at, string identifier) :
-            base(at, "unsupported identifier '" + identifier + "' (matches keyword)")
+        public UnsupportedIdentifierException(string at, string identifier, string message) :
+            base(at, "unsupported identifier '" + identifier + "' (" + message + ")")
         {
             Identifier = identifier;
         }

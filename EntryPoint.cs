@@ -18,6 +18,7 @@ namespace IL
                 zero = 0;
                 return true;
             }
+            public static void x() { Console.WriteLine("call x"); }
         }
 
         delegate long CompileResult(long x, long y, long z);
@@ -30,11 +31,13 @@ namespace IL
         void Run()
         {
             var result = Compile(@"
-                var zero, return0, afas;
-                zero = 03948319;
+                var res, return0, afas;
+                res = 1 + x - FooMethod(y, z);
+                PrintLine(res);
                 {}{}{}
-                zero = 5 * FooMethod(FooMethod(FooMethod(0, 1), 2), 3);
+                x();
                 PrintLine(x);
+                zero = 5 * FooMethod(FooMethod(FooMethod(0, 1), 2), 3);
                 return0 = 324;
                 PrintLine(zero);
                 if (true || x < 0) {
@@ -55,6 +58,21 @@ namespace IL
                     return 1;
                 }
             ");
+            var result1 = Compile(@"
+                var a, b, c;
+                a = x + y;
+                b = z - 12;
+                if (a > b) {
+                    PrintLine(42);
+                } else {
+                    PrintLine(112);
+                    return a;
+                }
+                return 12;
+            ");
+            Console.WriteLine(result1.Invoke(1, 2, 3));
+            Console.WriteLine(result1.Invoke(1, 2, 100));
+
             Console.WriteLine(result.Invoke(1, 1, 1));
             Console.WriteLine(result.Invoke(2, 2, 2));
             Console.WriteLine(result.Invoke(2, 3, 4));

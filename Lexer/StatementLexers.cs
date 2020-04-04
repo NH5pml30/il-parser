@@ -17,7 +17,7 @@ namespace IL
                     source => ExpressionParser.Parse(source, vars, funcs), "expression"),
             matchableVarDef = (vars, funcs) =>
                 new MatchableElement(Token.Type.VarDefStatement,
-                    VarDefParser.Parse, "variable definition statement"),
+                    source => VarDefParser.Parse(source, vars), "variable definition statement"),
             matchableVarAssign = (vars, funcs) =>
                 new MatchableElement(Token.Type.VarAssignStatement,
                     source => VarAssignParser.Parse(source, vars, funcs),
